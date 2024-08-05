@@ -169,8 +169,8 @@ def get_chart_buffer(chart_data):
     # Seek to the start of the buffer
     image_buffer.seek(0)
 
-    with open("1.png", 'wb') as f:
-        f.write(image_buffer.getvalue())
+    # with open("1.png", 'wb') as f:
+    #     f.write(image_buffer.getvalue())
 
     pyplot.close()
 
