@@ -1,12 +1,12 @@
 import io
 import json
+import zipfile
 import pandas
 from datetime import datetime
 from dotenv import load_dotenv
 import os
 import boto3
 from matplotlib import pyplot
-from matplotlib.patches import Patch
 
 load_dotenv()
 
@@ -163,10 +163,8 @@ def get_chart_buffer(chart_data):
     )
     pyplot.axis("equal")
 
-    # Save the plot to the BytesIO buffer
     pyplot.savefig(image_buffer, format="png")
 
-    # Seek to the start of the buffer
     image_buffer.seek(0)
 
     # with open("1.png", 'wb') as f:
@@ -177,28 +175,28 @@ def get_chart_buffer(chart_data):
     return image_buffer
 
 
-def store_insights(insights: dict, image):
+def store_insights(insights: dict, image: io.BytesIO):
     s3 = boto3.resource("s3")
 
     bucket = s3.Bucket(os.environ["S3_BUCKET_NAME"])
 
-    bucket.put_object(
-        Key=os.path.join(
-            os.environ["S3_BUCKET_FOLDER"],
-            datetime.now().strftime("%d-%m-%Y"),
-            f"insights.json",
-        ),
-        Body=json.dumps(insights),
-    )
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        json_data = json.dumps(insights).encode("utf-8")
+        zip_file.writestr("insights.json", json_data)
+        
+        zip_file.writestr("chart.png", image.getvalue())
+
+    zip_buffer.seek(0)
 
     bucket.put_object(
         Key=os.path.join(
             os.environ["S3_BUCKET_FOLDER"],
-            datetime.now().strftime("%d-%m-%Y"),
-            f"chart.png",
+            f"insights-{datetime.now().strftime('%d-%m-%Y')}.zip",
         ),
-        Body=image,
-        ContentType="image/png",
+        Body=zip_buffer.getvalue(),
+        ContentType="application/zip"
     )
 
 
