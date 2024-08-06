@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import os
 import boto3
 from matplotlib import pyplot
+import numpy
 
 load_dotenv()
 
@@ -24,27 +25,32 @@ def get_correct_answers_insights(
         (insights["number"] / number_of_attempted_questions) * 100, 2
     )
 
+    if len(insights) < 1:
+        return insights
+
     return insights
 
 
 def get_incorrect_answers_insights(
     dataframe: pandas.DataFrame, number_of_attempted_questions: int
 ) -> dict:
+    dataframe.loc[:, "Failure Reason"] = dataframe["Failure Reason"].fillna("Not specified")
+
     insights = {}
 
-    insights["number"] = len(
-        dataframe.loc[dataframe["Correctness"] == False, "Correctness"]
-    )
+    insights["number"] = len(dataframe)
 
     insights["percentage"] = round(
         (insights["number"] / number_of_attempted_questions) * 100,
         2,
     )
 
+    if len(insights) < 1:
+        return insights
+
     incorrect_answers_detailed_insights = []
 
     causes = dataframe["Failure Reason"].unique()
-    causes = [cause for cause in causes if type(cause) == str]
 
     if len(causes) == 0:
         insights["detailed_insights"] = None
@@ -103,11 +109,11 @@ def get_insights() -> dict:
     insights["questions_attempted"] = len(dataframe)
 
     correct_answers_insights = get_correct_answers_insights(
-        dataframe, insights["questions_attempted"]
+        dataframe.loc[dataframe["Correctness"] == True], insights["questions_attempted"]
     )
 
     incorrect_answers_insights = get_incorrect_answers_insights(
-        dataframe, insights["questions_attempted"]
+        dataframe.loc[dataframe["Correctness"] == False], insights["questions_attempted"]
     )
 
     insights["insights"] = {}
@@ -118,25 +124,32 @@ def get_insights() -> dict:
 
 
 def get_chart_data(insights: dict) -> dict:
-    labels = ["Correct Answers"]
-    labels.extend(
-        [
-            incorrect_answers_detailed_insight["cause"]
-            for incorrect_answers_detailed_insight in insights["insights"]["incorrect"][
-                "detailed_insights"
-            ]
-        ]
-    )
+    labels = []
+    sizes = []
 
-    sizes = [insights["insights"]["correct"]["number"]]
-    sizes.extend(
-        [
-            incorrect_answers_detailed_insight["number"]
-            for incorrect_answers_detailed_insight in insights["insights"]["incorrect"][
-                "detailed_insights"
+    if insights["insights"]["correct"]["number"] > 0:
+        labels.append("Correct Answers")
+
+        sizes = [insights["insights"]["correct"]["number"]]
+    
+    if insights["insights"]["incorrect"]["detailed_insights"]:
+        labels.extend(
+            [
+                incorrect_answers_detailed_insight["cause"]
+                for incorrect_answers_detailed_insight in insights["insights"]["incorrect"][
+                    "detailed_insights"
+                ]
             ]
-        ]
-    )
+        )
+
+        sizes.extend(
+            [
+                incorrect_answers_detailed_insight["number"]
+                for incorrect_answers_detailed_insight in insights["insights"]["incorrect"][
+                    "detailed_insights"
+                ]
+            ]
+        )
 
     return {"labels": labels, "sizes": sizes}
 
