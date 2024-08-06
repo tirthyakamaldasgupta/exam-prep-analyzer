@@ -20,11 +20,6 @@ def get_correct_answers_insights(
         dataframe.loc[dataframe["Correctness"] == True, "Correctness"]
     )
 
-    if insights["number"] < 1:
-        insights["percentage"] = None
-
-        return insights
-
     insights["percentage"] = round(
         (insights["number"] / number_of_attempted_questions) * 100, 2
     )
@@ -40,11 +35,6 @@ def get_incorrect_answers_insights(
     insights["number"] = len(
         dataframe.loc[dataframe["Correctness"] == False, "Correctness"]
     )
-
-    if insights["number"] < 1:
-        insights["percentage"] = None
-
-        return insights
 
     insights["percentage"] = round(
         (insights["number"] / number_of_attempted_questions) * 100,
@@ -185,7 +175,7 @@ def store_insights(insights: dict, image: io.BytesIO):
     with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
         json_data = json.dumps(insights).encode("utf-8")
         zip_file.writestr("insights.json", json_data)
-        
+
         zip_file.writestr("chart.png", image.getvalue())
 
     zip_buffer.seek(0)
@@ -196,7 +186,7 @@ def store_insights(insights: dict, image: io.BytesIO):
             f"insights-{datetime.now().strftime('%d-%m-%Y')}.zip",
         ),
         Body=zip_buffer.getvalue(),
-        ContentType="application/zip"
+        ContentType="application/zip",
     )
 
 

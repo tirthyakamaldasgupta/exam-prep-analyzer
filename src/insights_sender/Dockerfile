@@ -6,4 +6,6 @@ RUN pip install -r requirements.txt
 
 COPY insights_sender.py ${LAMBDA_TASK_ROOT}
 
+COPY template.html ${LAMBDA_TASK_ROOT}
+
 CMD [ "insights_sender.handler" ]

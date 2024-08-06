@@ -1,0 +1,38 @@
+{
+    "Records": [
+        {
+            "eventVersion": "2.1",
+            "eventSource": "aws:s3",
+            "awsRegion": "ap-south-1",
+            "eventTime": "2024-08-05T15:56:08.939Z",
+            "eventName": "ObjectCreated:Put",
+            "userIdentity": {
+                "principalId": "AWS:AROA3KMVKD4TP6BXCUM4J:examination-preparation-analyst"
+            },
+            "requestParameters": {
+                "sourceIPAddress": "3.7.255.123"
+            },
+            "responseElements": {
+                "x-amz-request-id": "1TK8P6J4SADK8WSJ",
+                "x-amz-id-2": "KdbhV4/bRhaM6Sp2zivkJUTHnchCROe7hJmusUu7Y16JtANsUNOxu+VyvjGnhiF/xkaqfEcv7e5SJREju3nQor3khbbndkJx"
+            },
+            "s3": {
+                "s3SchemaVersion": "1.0",
+                "configurationId": "examination-preparation-insights-generation",
+                "bucket": {
+                    "name": "examination-preparation-analyst",
+                    "ownerIdentity": {
+                        "principalId": "A3JB99NU2Z7JRA"
+                    },
+                    "arn": "arn:aws:s3:::examination-preparation-analyst"
+                },
+                "object": {
+                    "key": "aws/dva-c02/output/insights-06-08-2024.zip",
+                    "size": 25317,
+                    "eTag": "ee203a4a306e53b59bb9332210d3c7c4",
+                    "sequencer": "0066B0F618E396002E"
+                }
+            }
+        }
+    ]
+}

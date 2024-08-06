@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Insights - {{ data.examination_name }}{% if data.examination_code %} - {{ data.examination_code }}{% endif %} - {{ data.current_date }}</title>
+</head>
+
+<body>
+    <p>Dear {{ email_recipient_name }},</p>
+
+    <p>This is an automated message to provide you with the latest performance insights from the ongoing preparation for
+        the <strong>{{ data.examination_name }}{% if data.examination_code %} ({{ (data.examination_code) }}){% endif %}</strong> exam.</p>
+
+    <h3>Performance Summary:</h3>
+    <ul>
+        <li><strong>Total Questions Attempted: </strong>{{ data.questions_attempted }}</li>
+    </ul>
+
+    <h3>Insights:</h3>
+    <ul>
+        <li><strong>Correct Answers:</strong>
+            <ul>
+                <li><strong>Number: </strong>{{ data.insights.correct.number }}</li>
+                <li><strong>Percentage: </strong>{{ data.insights.correct.percentage }}</li>
+            </ul>
+        </li>
+        <li><strong>Incorrect Answers:</strong>
+            <ul>
+                <li><strong>Number: </strong>{{ data.insights.incorrect.number }}</li>
+                <li><strong>Percentage: </strong>{{ data.insights.incorrect.percentage }}</li>
+
+                {% if data.insights.incorrect.detailed_insights %}
+                <li><strong>Detailed Insights:</strong>
+                    <ul>
+                        {% for detailed_insight in data.insights.incorrect.detailed_insights %}
+                        <li><strong>{{ detailed_insight.cause }}</strong>
+                            <ul>
+                                <li><strong>Number: </strong>{{ detailed_insight.number }}</li>
+                                <li><strong>Percentage: </strong>{{ detailed_insight.percentage }}</li>
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+        </li>
+    </ul>
+
+    <p>Please find the attached chart for a visual representation of the percentages of correct and incorrect answers
+        categorized by failure type.</p>
+
+    <p>Thank you.</p>
+
+    <p>Best regards,<br>{{ data.emailer_name }}</p>
+</body>
+
+</html>
